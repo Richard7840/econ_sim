@@ -1,0 +1,11 @@
+[
+    {
+        "name": "Minor Crisis Beast Attack",
+        "description": "A small pack of crisis beasts has been spotted near your borders, disrupting supply lines.",
+        "trigger_threshold": 50,
+        "effects": {
+            "treasury": -200,
+            "public_opinion": -5
+        }
+    }
+]

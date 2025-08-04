@@ -1,0 +1,2 @@
+class ComponentDesign:
+    pass

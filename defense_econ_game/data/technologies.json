@@ -1,0 +1,17 @@
+[
+    {
+        "name": "Industrialization",
+        "rp_cost": 100,
+        "unlocks_industries": ["Metal Refineries", "Polymer Plants", "Basic Electronics Fab", "Aetheric Distilleries"]
+    },
+    {
+        "name": "Advanced Manufacturing",
+        "rp_cost": 200,
+        "unlocks_industries": ["Advanced Machinery", "Vehicle Assembly", "Aerospace Plant", "Golem Foundries"]
+    },
+    {
+        "name": "Efficient Private Investment",
+        "rp_cost": 150,
+        "private_ic_cost_reduction": 0.10
+    }
+]

@@ -1,0 +1,98 @@
+[
+    {
+        "name": "Food Production",
+        "tier": 1,
+        "profitability": 1.2,
+        "level_bonuses": [
+            {"level": 1, "research_bonus": {"technology_name": "Advanced Manufacturing", "bonus_per_level": 0.05}}
+        ]
+    },
+    {
+        "name": "Ore Mining",
+        "tier": 1,
+        "profitability": 1.0,
+        "level_bonuses": [
+            {"level": 1, "research_bonus": {"technology_name": "Advanced Manufacturing", "bonus_per_level": 0.05}}
+        ]
+    },
+    {
+        "name": "Lumber Mills",
+        "tier": 1,
+        "profitability": 1.1,
+        "level_bonuses": [
+            {"level": 1, "research_bonus": {"technology_name": "Advanced Manufacturing", "bonus_per_level": 0.05}}
+        ]
+    },
+    {
+        "name": "Ley Line Tapping",
+        "tier": 1,
+        "profitability": 1.5,
+        "level_bonuses": [
+            {"level": 1, "research_bonus": {"technology_name": "Advanced Manufacturing", "bonus_per_level": 0.05}}
+        ]
+    },
+    {
+        "name": "Metal Refineries",
+        "tier": 2,
+        "profitability": 1.8,
+        "level_bonuses": [
+            {"level": 1, "research_bonus": {"technology_name": "Advanced Manufacturing", "bonus_per_level": 0.05}}
+        ]
+    },
+    {
+        "name": "Polymer Plants",
+        "tier": 2,
+        "profitability": 1.6,
+        "level_bonuses": [
+            {"level": 1, "research_bonus": {"technology_name": "Advanced Manufacturing", "bonus_per_level": 0.05}}
+        ]
+    },
+    {
+        "name": "Basic Electronics Fab",
+        "tier": 2,
+        "profitability": 2.0,
+        "level_bonuses": [
+            {"level": 1, "research_bonus": {"technology_name": "Advanced Manufacturing", "bonus_per_level": 0.05}}
+        ]
+    },
+    {
+        "name": "Aetheric Distilleries",
+        "tier": 2,
+        "profitability": 2.2,
+        "level_bonuses": [
+            {"level": 1, "research_bonus": {"technology_name": "Advanced Manufacturing", "bonus_per_level": 0.05}}
+        ]
+    },
+    {
+        "name": "Advanced Machinery",
+        "tier": 3,
+        "profitability": 2.5,
+        "level_bonuses": [
+            {"level": 1, "research_bonus": {"technology_name": "Advanced Manufacturing", "bonus_per_level": 0.05}}
+        ]
+    },
+    {
+        "name": "Vehicle Assembly",
+        "tier": 3,
+        "profitability": 2.3,
+        "level_bonuses": [
+            {"level": 1, "research_bonus": {"technology_name": "Advanced Manufacturing", "bonus_per_level": 0.05}}
+        ]
+    },
+    {
+        "name": "Aerospace Plant",
+        "tier": 3,
+        "profitability": 2.8,
+        "level_bonuses": [
+            {"level": 1, "research_bonus": {"technology_name": "Advanced Manufacturing", "bonus_per_level": 0.05}}
+        ]
+    },
+    {
+        "name": "Golem Foundries",
+        "tier": 3,
+        "profitability": 3.0,
+        "level_bonuses": [
+            {"level": 1, "research_bonus": {"technology_name": "Advanced Manufacturing", "bonus_per_level": 0.05}}
+        ]
+    }
+]
