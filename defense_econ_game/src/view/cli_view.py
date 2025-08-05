@@ -3,16 +3,35 @@ import math
 class CLIView:
     def display_game_state(self, game_state):
         player = game_state.player_nation
-        treasury_gain = sum(industry.ic * industry.profitability for industry in player.industries)
+        treasury_gain = 0
+        for industry in player.industries:
+            government_profit = industry.government_ic * industry.base_profitability
+            private_profit = industry.private_ic * industry.profitability
+            treasury_gain += government_profit * 0.8
+            treasury_gain += private_profit * industry.tax_rate
+
+        # Add tax revenue from GDP
+        treasury_gain += player.civilian_gdp * player.tax_rate
+
+        # Subtract budget expenses
+        treasury_gain -= player.budget['infrastructure_investment']
+        treasury_gain -= player.budget['social_spending']
+
         crisis_gain = player.industrial_capacity / 10
 
         print("--- Game State ---")
         print(f"Turn: {game_state.turn}")
         print(f"Player Nation: {player.name}")
-        print(f"  Treasury: {player.treasury} (+{treasury_gain})")
+        print(f"  Treasury: {player.treasury:.1f} (+{treasury_gain:.1f})")
         print(f"  Industrial Capacity: {player.industrial_capacity}")
         print(f"  Research Points: {player.research_points}")
-        print(f"  Public Opinion: {player.public_opinion}")
+        opinion_change_rate = (player.target_public_opinion - player.public_opinion) * 0.20
+        print(f"  Public Opinion: {player.public_opinion:.1f} (Target: {player.target_public_opinion:.1f}, Change: {opinion_change_rate:+.1f})")
+        projected_gdp_increase = player.civilian_gdp * player.get_gdp_growth_rate()
+        print(f"  Civilian GDP: {player.civilian_gdp:.2f} (+{projected_gdp_increase:.2f})")
+        print(f"  Tax Rate: {player.tax_rate*100:.0f}%")
+        print(f"  Infrastructure Investment: {player.budget['infrastructure_investment']}")
+        print(f"  Social Spending: {player.budget['social_spending']}")
         print("  Industries:")
         profitable_industries = [ind for ind in player.industries if ind.profitability > 0]
         total_profitability = sum(ind.profitability for ind in profitable_industries)

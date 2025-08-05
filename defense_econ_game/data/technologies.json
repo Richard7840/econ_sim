@@ -2,16 +2,25 @@
     {
         "name": "Industrialization",
         "rp_cost": 100,
-        "unlocks_industries": ["Metal Refineries", "Polymer Plants", "Basic Electronics Fab", "Aetheric Distilleries"]
+        "unlocks_industries": ["Metal Refineries", "Polymer Plants", "Basic Electronics Fab", "Aetheric Distilleries"],
+        "effects": {
+            "gdp_growth_modifier": 0.001
+        }
     },
     {
         "name": "Advanced Manufacturing",
         "rp_cost": 200,
-        "unlocks_industries": ["Advanced Machinery", "Vehicle Assembly", "Aerospace Plant", "Golem Foundries"]
+        "unlocks_industries": ["Advanced Machinery", "Vehicle Assembly", "Aerospace Plant", "Golem Foundries"],
+        "effects": {
+            "gdp_growth_modifier": 0.002
+        }
     },
     {
         "name": "Efficient Private Investment",
         "rp_cost": 150,
-        "private_ic_cost_reduction": 0.10
+        "private_ic_cost_reduction": 0.10,
+        "effects": {
+            "gdp_growth_modifier": 0.0015
+        }
     }
 ]

@@ -22,7 +22,7 @@ class Game:
         with open("c:/Users/rilew/Desktop/Side Projects/game/econ_sim/defense_econ_game/data/technologies.json") as f:
             technologies_data = json.load(f)
             for tech_data in technologies_data:
-                self.game_state.available_technologies.append(Technology(tech_data['name'], tech_data['rp_cost'], tech_data.get('unlocks_industries'), tech_data.get('private_ic_cost_reduction', 0.0)))
+                self.game_state.available_technologies.append(Technology(tech_data['name'], tech_data['rp_cost'], tech_data.get('unlocks_industries'), tech_data.get('private_ic_cost_reduction', 0.0), tech_data.get('effects')))
 
     def load_events(self):
         with open("c:/Users/rilew/Desktop/Side Projects/game/econ_sim/defense_econ_game/data/events.json") as f:
@@ -161,6 +161,36 @@ class Game:
                         print("Invalid choice.")
                 except ValueError:
                     print("Invalid input.")
+            elif action == "set tax":
+                try:
+                    new_tax_rate = float(input("Enter new national tax rate (e.g., 0.15 for 15%): "))
+                    if 0 <= new_tax_rate <= 1.0:
+                        self.controller.set_tax_rate(self.game_state.player_nation, new_tax_rate)
+                        print(f"National tax rate set to {new_tax_rate*100:.0f}%.")
+                    else:
+                        print("Invalid tax rate. Must be between 0 and 1.0.")
+                except ValueError:
+                    print("Invalid input.")
+            elif action == "budget":
+                budget_category_input = input("Enter budget category ((I)nfrastructure_investment, (S)ocial_spending): ").lower()
+                category_map = {
+                    'i': 'infrastructure_investment',
+                    's': 'social_spending'
+                }
+                category = category_map.get(budget_category_input, '')
+
+                if category:
+                    try:
+                        amount = int(input(f"Enter amount for {category}: "))
+                        if amount >= 0:
+                            self.controller.set_budget(self.game_state.player_nation, category, amount)
+                            print(f"Budget for {category} set to {amount}.")
+                        else:
+                            print("Amount cannot be negative.")
+                    except ValueError:
+                        print("Invalid input.")
+                else:
+                    print("Invalid budget category.")
             elif action == "end turn":
                 # Research
                 if self.game_state.player_nation.current_research:
@@ -217,6 +247,9 @@ class Game:
 
                 self.game_state.player_nation.treasury += total_treasury_gain
 
+                # Update Civilian Economies
+                self._update_civilian_economies()
+
                 # Crisis
                 self.game_state.crisis_awareness += self.game_state.player_nation.industrial_capacity / 10
                 self.check_for_events()
@@ -224,3 +257,24 @@ class Game:
                 self.game_state.turn += 1
             elif action == "quit":
                 break
+
+    def _update_civilian_economies(self):
+        for nation in [self.game_state.player_nation]: # Only player nation for now
+            # Deduct budget spending
+            nation.treasury -= nation.budget["infrastructure_investment"]
+            nation.treasury -= nation.budget["social_spending"]
+
+            # Calculate GDP growth rate
+            final_growth_rate = nation.get_gdp_growth_rate()
+
+            # Update GDP
+            nation.civilian_gdp *= (1 + final_growth_rate)
+
+            # Calculate and Add Income (Tax Revenue)
+            tax_revenue = nation.civilian_gdp * nation.tax_rate
+            nation.treasury += tax_revenue
+
+            # Gradually move current public opinion towards target
+            opinion_difference = nation.target_public_opinion - nation.public_opinion
+            nation.public_opinion += opinion_difference * 0.20 # Move 20% of the difference per turn
+            nation.public_opinion = max(0, min(100, nation.public_opinion)) # Clamp between 0 and 100

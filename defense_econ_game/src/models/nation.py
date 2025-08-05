@@ -3,11 +3,26 @@ class Nation:
         self.name = name
         self.treasury = 1000
         self.research_points = 50
-        self.public_opinion = 75
+        self.public_opinion = 50.0 # Initialize at 50.0
+        self.target_public_opinion = 50.0 # Initialize at 50.0
         self.industries = []
         self.technologies = []
         self.current_research = None
         self.policies = {}
+        self.civilian_gdp = 10000.0 # Initialize with a starting value
+        self.tax_rate = 0.15 # Initialize at 0.15 (15%)
+        self.budget = {
+            "infrastructure_investment": 0,
+            "social_spending": 0
+        }
+        self._calculate_target_public_opinion() # Call after all attributes are initialized
+
+    def _calculate_target_public_opinion(self):
+        ideal_opinion = 50.0 # Base ideal opinion
+        # Assuming population of 1000 for now for social spending impact
+        ideal_opinion += (self.budget["social_spending"] / 1000) * 100 
+        ideal_opinion -= (self.tax_rate - 0.15) * 100 # Tax rate impact
+        self.target_public_opinion = max(0, min(100, ideal_opinion)) # Clamp ideal opinion
 
     @property
     def industrial_capacity(self):
@@ -23,3 +38,27 @@ class Nation:
                         if research_bonus_info['technology_name'] == self.current_research.name:
                             bonus += research_bonus_info['bonus_per_level'] * industry.level
         return self.research_points * (1 + bonus)
+
+    def get_gdp_growth_rate(self):
+        final_growth_rate = 0.01 # Base rate
+
+        # Infrastructure Bonus
+        if self.budget["infrastructure_investment"] > 0:
+            final_growth_rate += (self.budget["infrastructure_investment"] ** 0.5) / 1000
+
+        # Stability Bonus
+        if self.public_opinion > 75:
+            final_growth_rate += 0.01
+        elif self.public_opinion < 25:
+            final_growth_rate -= 0.02
+        else:
+            final_growth_rate += 0.005
+
+        # Technology Bonus
+        tech_bonus = 0.0
+        for tech in self.technologies:
+            if tech.is_researched and "gdp_growth_modifier" in tech.effects:
+                tech_bonus += tech.effects["gdp_growth_modifier"]
+        final_growth_rate += tech_bonus
+
+        return final_growth_rate
