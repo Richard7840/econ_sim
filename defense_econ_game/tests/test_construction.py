@@ -24,7 +24,7 @@ class TestConstruction(TestHarness):
         self.run_command("start_project", "build_ic_1", "Ore Mining")
         
         project_def = next(p for p in self.game.game_state.available_projects if p['id'] == "build_ic_1")
-        turns_to_complete = int(project_def['cp_cost'] / (5 + sum(ind.ic for ind in self.game.game_state.player_nation.industries) * 0.5 * 0.1)) + 1 # Estimate turns
+        turns_to_complete = int(project_def['cp_cost'] / self.game.game_state.player_nation.calculate_construction_points()) + 1
         
         for _ in range(turns_to_complete):
             self.run_command("end_turn")
@@ -38,7 +38,7 @@ class TestConstruction(TestHarness):
         self.run_command("start_project", "build_infrastructure_1")
 
         project_def = next(p for p in self.game.game_state.available_projects if p['id'] == "build_infrastructure_1")
-        turns_to_complete = int(project_def['cp_cost'] / (5 + sum(ind.ic for ind in self.game.game_state.player_nation.industries) * 0.5 * 0.1)) + 1 # Estimate turns
+        turns_to_complete = int(project_def['cp_cost'] / self.game.game_state.player_nation.calculate_construction_points()) + 1
 
         for _ in range(turns_to_complete):
             self.run_command("end_turn")
@@ -57,19 +57,18 @@ class TestConstruction(TestHarness):
         """Test that a queued project can be cancelled."""
         for _ in range(self.game.game_state.player_nation.construction_slots):
             self.run_command("start_project", "build_ic_1", "Ore Mining")
-        self.run_command("start_project", "build_infrastructure_1") # This goes to queue
+        self.run_command("start_project", "build_infrastructure_1")
         self.assertEqual(len(self.game.game_state.player_nation.project_queue), 1)
 
-        # The queued project is at index `construction_slots` (0-indexed) in the combined list
-        cancel_index = self.game.game_state.player_nation.construction_slots 
+        cancel_index = self.game.game_state.player_nation.construction_slots
         self.game.process_command(Command("construction", {"type": "cancel_project", "queue_index": cancel_index}))
         self.assertEqual(len(self.game.game_state.player_nation.project_queue), 0)
 
     def test_treasury_deduction_for_upkeep(self):
         """Test that treasury is deducted for active project upkeep."""
         self.run_command("start_project", "build_ic_1", "Ore Mining")
-        
-        # Simulate the treasury change for one turn *after* running the command
-        expected_treasury = self._simulate_treasury_change_for_turn(self.game.game_state.player_nation, self.game.game_state)
+        initial_nation_state = copy.deepcopy(self.game.game_state.player_nation)
+        initial_game_state = copy.deepcopy(self.game.game_state)
+        expected_treasury = self._simulate_treasury_change_for_turn(initial_nation_state, initial_game_state)
         self.run_command("end_turn")
         self.assertAlmostEqual(self.game.game_state.player_nation.treasury, expected_treasury, places=2)

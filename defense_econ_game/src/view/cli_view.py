@@ -12,31 +12,13 @@ class CLIView:
             game_state (GameState): The current state of the game.
         """
         player = game_state.player_nation
-        treasury_gain = 0
-        for industry in player.industries:
-            government_profit = industry.government_ic * industry.base_profitability
-            private_profit = industry.private_ic * industry.profitability
-            treasury_gain += government_profit * 0.8
-            treasury_gain += private_profit * industry.tax_rate
-
-        # Add tax revenue from GDP
-        treasury_gain += player.civilian_gdp * player.tax_rate
-
-        # Subtract budget expenses
-        treasury_gain -= player.budget['social_spending']
-
-        # Subtract construction upkeep
-        for project in player.active_projects:
-            project_def = next((p for p in game_state.available_projects if p['id'] == project.project_id), None)
-            if project_def:
-                treasury_gain -= project_def['upkeep_cost']
-
+        projected_treasury_change = player.calculate_projected_treasury_change(game_state.available_projects)
         crisis_gain = player.industrial_capacity / 10
 
         print("--- Game State ---")
         print(f"Turn: {game_state.turn}")
         print(f"Player Nation: {player.name}")
-        print(f"  Treasury: {player.treasury:.1f} (+{treasury_gain:.1f})")
+        print(f"  Treasury: {player.treasury:.1f} ({projected_treasury_change:+.1f})")
         print(f"  Industrial Capacity: {player.industrial_capacity}")
         print(f"  Research Points: {player.research_points}")
         opinion_change_rate = (player.target_public_opinion - player.public_opinion) * 0.20
@@ -73,11 +55,7 @@ class CLIView:
         print(f"Construction Slots: {len(player.active_projects)}/{player.construction_slots}")
         if player.active_projects:
             print("Active Projects:")
-            total_ic = sum(industry.ic for industry in player.industries)
-            ic_focus_modifier = 0.5 if player.ic_focus_policy == "Balanced" else 0.8
-            cp_from_ic = total_ic * ic_focus_modifier * 0.1 # CP_PER_IC_POINT
-            tech_bonus = 0 # TODO: Implement tech bonus
-            total_cp_generated = 5 + cp_from_ic + tech_bonus # BASE_CP
+            total_cp_generated = player.calculate_construction_points()
             cp_per_project = total_cp_generated
 
             for i, project in enumerate(player.active_projects):
