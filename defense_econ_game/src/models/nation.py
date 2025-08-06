@@ -1,3 +1,5 @@
+from src.models.project_instance import ProjectInstance
+
 class Nation:
     def __init__(self, name):
         self.name = name
@@ -12,9 +14,13 @@ class Nation:
         self.civilian_gdp = 10000.0 # Initialize with a starting value
         self.tax_rate = 0.15 # Initialize at 0.15 (15%)
         self.budget = {
-            "infrastructure_investment": 0,
             "social_spending": 0
         }
+        self.construction_slots = 3
+        self.active_projects: list[ProjectInstance] = []
+        self.project_queue: list[ProjectInstance] = []
+        self.infrastructure_level = 1
+        self.ic_focus_policy = "Balanced"
         self._calculate_target_public_opinion() # Call after all attributes are initialized
 
     def _calculate_target_public_opinion(self):
@@ -43,8 +49,7 @@ class Nation:
         final_growth_rate = 0.01 # Base rate
 
         # Infrastructure Bonus
-        if self.budget["infrastructure_investment"] > 0:
-            final_growth_rate += (self.budget["infrastructure_investment"] ** 0.5) / 1000
+        final_growth_rate += (self.infrastructure_level - 1) * 0.005
 
         # Stability Bonus
         if self.public_opinion > 75:

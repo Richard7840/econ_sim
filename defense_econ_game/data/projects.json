@@ -1,0 +1,22 @@
+[
+    {
+        "id": "build_ic_1",
+        "name": "Construct Industrial Complex",
+        "cp_cost": 100,
+        "upkeep_cost": 100,
+        "effects": {
+            "add_ic": 10
+        },
+        "requires_target": true
+    },
+    {
+        "id": "build_infrastructure_1",
+        "name": "Develop Infrastructure",
+        "cp_cost": 500,
+        "upkeep_cost": 50,
+        "effects": {
+            "add_infrastructure": 1
+        },
+        "requires_target": false
+    }
+]

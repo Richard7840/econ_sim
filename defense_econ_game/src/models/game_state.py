@@ -10,3 +10,4 @@ class GameState:
         self.social_dissonance = 0
         self.available_events = []
         self.all_industries = []
+        self.available_projects = []

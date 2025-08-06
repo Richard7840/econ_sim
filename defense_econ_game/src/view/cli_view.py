@@ -14,8 +14,13 @@ class CLIView:
         treasury_gain += player.civilian_gdp * player.tax_rate
 
         # Subtract budget expenses
-        treasury_gain -= player.budget['infrastructure_investment']
         treasury_gain -= player.budget['social_spending']
+
+        # Subtract construction upkeep
+        for project in player.active_projects:
+            project_def = next((p for p in game_state.available_projects if p['id'] == project.project_id), None)
+            if project_def:
+                treasury_gain -= project_def['upkeep_cost']
 
         crisis_gain = player.industrial_capacity / 10
 
@@ -30,8 +35,9 @@ class CLIView:
         projected_gdp_increase = player.civilian_gdp * player.get_gdp_growth_rate()
         print(f"  Civilian GDP: {player.civilian_gdp:.2f} (+{projected_gdp_increase:.2f})")
         print(f"  Tax Rate: {player.tax_rate*100:.0f}%")
-        print(f"  Infrastructure Investment: {player.budget['infrastructure_investment']}")
         print(f"  Social Spending: {player.budget['social_spending']}")
+        print(f"  Infrastructure Level: {player.infrastructure_level}")
+        print(f"  IC Focus: {player.ic_focus_policy}")
         print("  Industries:")
         profitable_industries = [ind for ind in player.industries if ind.profitability > 0]
         total_profitability = sum(ind.profitability for ind in profitable_industries)
@@ -51,6 +57,30 @@ class CLIView:
             print(f"  Current Research: None (+{effective_rp:.1f} RP/turn)")
             
         print(f"  Researched Technologies: {[tech.name for tech in player.technologies]}")
-        print(f"Crisis Awareness: {game_state.crisis_awareness} (+{crisis_gain})")
+        print(f"Crisis Awareness: {game_state.crisis_awareness:.1f} (+{crisis_gain:.1f})")
         print(f"Social Dissonance: {game_state.social_dissonance} (+0)")
+
+        print("--- Construction ---")
+        print(f"Construction Slots: {len(player.active_projects)}/{player.construction_slots}")
+        if player.active_projects:
+            print("Active Projects:")
+            total_ic = sum(industry.ic for industry in player.industries)
+            ic_focus_modifier = 0.5 if player.ic_focus_policy == "Balanced" else 0.8
+            cp_from_ic = total_ic * ic_focus_modifier * 0.1 # CP_PER_IC_POINT
+            tech_bonus = 0 # TODO: Implement tech bonus
+            total_cp_generated = 5 + cp_from_ic + tech_bonus # BASE_CP
+            cp_per_project = total_cp_generated
+
+            for i, project in enumerate(player.active_projects):
+                project_def = next((p for p in game_state.available_projects if p['id'] == project.project_id), None)
+                if project_def:
+                    target_str = f" [{project.target}]" if project.target else ""
+                    print(f"  {i+1}. {project_def['name']}{target_str} ({project.current_cp:.0f}/{project_def['cp_cost']} CP, +{cp_per_project:.1f} CP/turn)")
+        if player.project_queue:
+            print("Project Queue:")
+            for i, project in enumerate(player.project_queue):
+                project_def = next((p for p in game_state.available_projects if p['id'] == project.project_id), None)
+                if project_def:
+                    target_str = f" [{project.target}]" if project.target else ""
+                    print(f"  {i+1+len(player.active_projects)}. {project_def['name']}{target_str}")
         print("------------------")
