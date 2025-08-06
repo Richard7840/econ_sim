@@ -3,13 +3,39 @@ from src.commands import Command
 from src.models.industry import Industry
 
 class GameController:
+    """
+    Handles the game logic and player commands.
+
+    Attributes:
+        test_mode (bool): Whether the game is in test mode.
+    """
     def __init__(self, test_mode=False):
+        """
+        Initializes the GameController.
+
+        Args:
+            test_mode (bool, optional): Whether the game is in test mode. Defaults to False.
+        """
         self.test_mode = test_mode
 
     def _print(self, *args, **kwargs):
+        """
+        Prints messages if not in test mode.
+
+        Args:
+            *args: Variable length argument list.
+            **kwargs: Arbitrary keyword arguments.
+        """
         if not self.test_mode:
             print(*args, **kwargs)
     def execute_command(self, game_state, command):
+        """
+        Executes a command.
+
+        Args:
+            game_state (GameState): The current state of the game.
+            command (Command): The command to execute.
+        """
         nation = game_state.player_nation
         if command.type == "end_turn":
             # Research
@@ -92,6 +118,14 @@ class GameController:
                 self.set_ic_focus(nation, command.payload['policy'])
 
     def set_research(self, nation, tech_name, game_state):
+        """
+        Sets the current research for a nation.
+
+        Args:
+            nation (Nation): The nation to set the research for.
+            tech_name (str): The name of the technology to research.
+            game_state (GameState): The current state of the game.
+        """
         if not self.test_mode:
             print(f"Available technologies: {[tech.name for tech in game_state.available_technologies]}")
         for tech in game_state.available_technologies:
@@ -105,6 +139,13 @@ class GameController:
                 print("Invalid technology or already researched.")
 
     def set_policy(self, nation, policy_data):
+        """
+        Sets a policy for a nation.
+
+        Args:
+            nation (Nation): The nation to set the policy for.
+            policy_data (dict): The policy data.
+        """
         # This logic was previously in Game.run()
         industry_name = policy_data["industry"]
         policy_type = policy_data["type"]
@@ -140,6 +181,12 @@ class GameController:
             print("Invalid policy type.")
 
     def _update_civilian_economies(self, game_state):
+        """
+        Updates the civilian economies of all nations.
+
+        Args:
+            game_state (GameState): The current state of the game.
+        """
         for nation in [game_state.player_nation]: # Only player nation for now
             # Deduct budget spending
             nation.treasury -= nation.budget["social_spending"]
@@ -160,6 +207,12 @@ class GameController:
             nation.public_opinion = max(0, min(100, nation.public_opinion)) # Clamp between 0 and 100
 
     def _update_construction(self, game_state):
+        """
+        Updates the construction projects of all nations.
+
+        Args:
+            game_state (GameState): The current state of the game.
+        """
         for nation in [game_state.player_nation]: # TODO: Update for AI nations
             # First, manage the queue
             while len(nation.active_projects) < nation.construction_slots and nation.project_queue:
@@ -205,6 +258,12 @@ class GameController:
                     nation.active_projects.remove(project)
 
     def _check_for_events(self, game_state):
+        """
+        Checks for and triggers events.
+
+        Args:
+            game_state (GameState): The current state of the game.
+        """
         for event in game_state.available_events:
             if game_state.crisis_awareness >= event.trigger_threshold:
                 print(f"EVENT: {event.name}")
@@ -215,10 +274,25 @@ class GameController:
                 game_state.available_events.remove(event)
 
     def set_tax_rate(self, nation, rate):
+        """
+        Sets the tax rate for a nation.
+
+        Args:
+            nation (Nation): The nation to set the tax rate for.
+            rate (float): The new tax rate.
+        """
         nation.tax_rate = rate
         nation._calculate_target_public_opinion()
 
     def set_budget(self, nation, category, amount):
+        """
+        Sets the budget for a nation.
+
+        Args:
+            nation (Nation): The nation to set the budget for.
+            category (str): The budget category to set.
+            amount (float): The new budget amount.
+        """
         if category in nation.budget:
             nation.budget[category] = amount
             nation._calculate_target_public_opinion()
@@ -226,12 +300,27 @@ class GameController:
             print(f"Invalid budget category: {category}")
 
     def start_project(self, nation, project_id, target=None):
+        """
+        Starts a construction project for a nation.
+
+        Args:
+            nation (Nation): The nation to start the project for.
+            project_id (str): The ID of the project to start.
+            target (str, optional): The target of the project. Defaults to None.
+        """
         if len(nation.active_projects) < nation.construction_slots:
             nation.active_projects.append(ProjectInstance(project_id, target))
         else:
             nation.project_queue.append(ProjectInstance(project_id, target))
 
     def cancel_project(self, nation, queue_index):
+        """
+        Cancels a construction project for a nation.
+
+        Args:
+            nation (Nation): The nation to cancel the project for.
+            queue_index (int): The index of the project in the queue.
+        """
         if 0 <= queue_index < len(nation.active_projects):
             project = nation.active_projects.pop(queue_index)
             # Partial refund logic can be added here
@@ -239,4 +328,11 @@ class GameController:
             nation.project_queue.pop(queue_index - len(nation.active_projects))
 
     def set_ic_focus(self, nation, policy):
+        """
+        Sets the industrial capacity focus for a nation.
+
+        Args:
+            nation (Nation): The nation to set the IC focus for.
+            policy (str): The new IC focus policy.
+        """
         nation.ic_focus_policy = policy

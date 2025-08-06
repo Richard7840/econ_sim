@@ -1,8 +1,23 @@
 class GameRunner:
+    """
+    Runs the main game loop.
+
+    Attributes:
+        game (Game): The game instance.
+    """
     def __init__(self, game):
+        """
+        Initializes the GameRunner.
+
+        Args:
+            game (Game): The game instance.
+        """
         self.game = game
 
     def run(self):
+        """
+        Runs the main game loop.
+        """
         while True:
             self.game.view.display_game_state(self.game.game_state)
             action = self.game.controller.get_player_action()
@@ -10,6 +25,12 @@ class GameRunner:
                 self.handle_action(action)
 
     def handle_action(self, action):
+        """
+        Handles a player action.
+
+        Args:
+            action (Action): The action to handle.
+        """
         if action.type == "end_turn":
             self.game._end_turn()
         elif action.type == "quit":
@@ -26,6 +47,12 @@ class GameRunner:
             self.handle_construction_action(action.payload)
 
     def handle_construction_action(self, payload):
+        """
+        Handles a construction action.
+
+        Args:
+            payload (ConstructionPayload): The construction payload.
+        """
         if payload.type == "start_project":
             self.game.controller.start_project(self.game.game_state.player_nation, payload.project_id, payload.target)
         elif payload.type == "cancel_project":

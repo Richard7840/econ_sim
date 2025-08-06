@@ -1,7 +1,16 @@
 import math
 
 class CLIView:
+    """
+    The command-line interface view for the game.
+    """
     def display_game_state(self, game_state):
+        """
+        Displays the current game state to the user.
+
+        Args:
+            game_state (GameState): The current state of the game.
+        """
         player = game_state.player_nation
         treasury_gain = 0
         for industry in player.industries:

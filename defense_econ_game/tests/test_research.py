@@ -13,8 +13,12 @@ class TestResearch(TestHarness):
         # Using "Industrialization" as an available technology with rp_cost 100
         self.game.process_command(Command("research", "Industrialization"))
         # Simulate enough turns to complete research (adjust based on actual RP gain)
-        # Assuming 50 RP/turn, 100 cost, so 2 turns. Add one more for safety.
-        for _ in range(3):
+        # Calculate turns needed dynamically
+        tech = self.game.game_state.player_nation.current_research
+        effective_rp = self.game.game_state.player_nation.get_effective_research_points()
+        turns_needed = int((tech.rp_cost + effective_rp - 1) // effective_rp) # Ceiling division
+        turns_to_run = turns_needed + 1 # Add one more for safety
+        for _ in range(turns_to_run):
             self.run_command("end_turn")
         self.assertTrue(self.game.game_state.player_nation.current_research is None or self.game.game_state.player_nation.current_research.is_researched)
 
@@ -22,7 +26,11 @@ class TestResearch(TestHarness):
         initial_industry_count = len(self.game.game_state.player_nation.industries)
         # Using "Advanced Manufacturing" which unlocks new industries
         self.game.process_command(Command("research", "Advanced Manufacturing"))
-        for _ in range(5): # Simulate turns for research completion (rp_cost 200, 50 rp/turn = 4 turns)
+        tech = self.game.game_state.player_nation.current_research
+        effective_rp = self.game.game_state.player_nation.get_effective_research_points()
+        turns_needed = int((tech.rp_cost + effective_rp - 1) // effective_rp) # Ceiling division
+        turns_to_run = turns_needed + 1 # Add one more for safety
+        for _ in range(turns_to_run):
             self.run_command("end_turn")
         self.assertGreater(len(self.game.game_state.player_nation.industries), initial_industry_count)
         # Assert that one of the specific new industries is present
